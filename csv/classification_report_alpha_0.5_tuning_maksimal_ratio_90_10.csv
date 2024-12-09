@@ -1,0 +1,6 @@
+,precision,recall,f1-score
+Negatif,0.84,0.88,0.86
+Positif,0.2,0.15,0.17
+accuracy,0.76,0.76,0.76
+macro avg,0.52,0.52,0.51
+weighted avg,0.73,0.76,0.74
