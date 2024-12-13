@@ -105,7 +105,7 @@ with col1:
     input_text = st.text_area(
         "Masukkan Teks untuk Diklasifikasikan:",
         height=150,
-        placeholder="Contoh: Saya suka Islam...",
+        placeholder="Masukan teks yang akan diklasifikasikan disini",
     )
 
 with col2:
