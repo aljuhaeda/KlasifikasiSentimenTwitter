@@ -10,11 +10,6 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import os
 
-# Pastikan Anda telah mengunduh data NLTK sebelumnya
-# Jika belum, uncomment baris berikut dan jalankan sekali
-# nltk.download('punkt')
-# nltk.download('stopwords')
-
 # Mengatur konfigurasi halaman
 st.set_page_config(
     page_title="🐦 Klasifikasi Sentimen Ujaran Kebencian",
