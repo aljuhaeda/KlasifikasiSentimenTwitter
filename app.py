@@ -6,8 +6,6 @@ import nltk
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
 from nltk.tokenize import word_tokenize
-import seaborn as sns
-import matplotlib.pyplot as plt
 import os
 
 # Mengunduh data NLTK yang dibutuhkan (aman dijalankan berulang kali - nltk akan skip jika sudah ada)
@@ -102,7 +100,7 @@ def get_top_features(model, vectorizer, class_label, top_n=10):
 
 # Build absolute paths
 base_dir = os.path.dirname(os.path.abspath(__file__))
-model_path = os.path.join(base_dir, 'pickle', 'mnb_alpha_1.0_tuning_minimal_ratio_80_20.pkl')  # Sesuaikan dengan nama file model Anda
+model_path = os.path.join(base_dir, 'pickle', 'mnb_alpha_2.0_tuning_maksimal_ratio_80_20.pkl')  # alpha=2.0/80_20: best hate-speech recall among tested configs (see README)
 vectorizer_path = os.path.join(base_dir, 'pickle', 'countvectorizer.pkl')  # Sesuaikan dengan nama file vectorizer Anda
 
 # Area Input Teks dan Tombol Predict menggunakan layout columns

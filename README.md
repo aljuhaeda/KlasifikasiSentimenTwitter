@@ -23,18 +23,19 @@ Full walkthrough is in [`skripsi.ipynb`](skripsi.ipynb).
 
 ## Results
 
-Best accuracy — **84%** — reached at `alpha=2.0`–`3.0` on the 70/30 split (see `csv/accuracy_*.csv` for the full sweep across every alpha × split combination tested).
+Headline accuracy tops out at **84%** (`alpha=3.0`, 70/30 split), but accuracy is the wrong number to optimize here — see Key Finding below. The demo app ships with **`alpha=2.0`, 80/20 split**, chosen for the best hate-speech recall among every tested configuration, not the best accuracy:
 
-| Class | Precision | Recall | F1 |
+| Config | Accuracy | Positif (hate speech) Recall | Positif F1 |
 |---|---|---|---|
-| Negatif (no hate speech) | 0.87 | 0.93 | 0.90 |
-| Positif (hate speech) | 0.42 | 0.26 | 0.32 |
+| alpha=3.0, 70/30 (highest accuracy) | 0.84 | 0.14 | 0.21 |
+| alpha=1.0, 80/20 | 0.82 | 0.26 | 0.32 |
+| **alpha=2.0, 80/20 (deployed)** | 0.83 | **0.32** | **0.38** |
 
-*(alpha=1.0, 80/20 split — one of the tuned configurations, not the best-accuracy one; shown because it's the config the demo app ships with.)*
+Full sweep across every alpha × split combination tested is in `csv/accuracy_*.csv` and `csv/classification_report_*.csv`.
 
 ## Key Finding / Limitation
 
-**Class imbalance is the real bottleneck, not the algorithm.** Overall accuracy (82–84%) looks strong, but it's propped up by the majority `Negatif` class — recall on `Positif` (the class that actually matters for a hate-speech filter) tops out around 0.26–0.32 across most configurations. In other words: the model catches the *absence* of hate speech reliably but misses a majority of the *actual* hate speech in the test set. This is documented and discussed as the central limitation in the published paper (see below), not glossed over.
+**Class imbalance is the real bottleneck, not the algorithm — and optimizing for accuracy alone makes the actual problem worse.** The alpha that maximizes headline accuracy (3.0) has the *worst* recall on the `Positif` (hate speech) class of any tuned configuration — it does well by predicting `Negatif` almost every time, since that's the majority class. A hate-speech filter that catches 14% of real hate speech is not a useful filter, regardless of its accuracy score. `alpha=2.0` is a meaningfully better trade-off (recall 0.32 vs 0.14) at essentially no accuracy cost, which is why it's what the demo actually runs. This tension — and the fact that even the best config still misses roughly 2 in 3 real hate-speech tweets — is the central limitation, documented in the published paper, not glossed over.
 
 ## Publication
 
@@ -66,7 +67,6 @@ KlasifikasiSentimenTwitter/
 ├── skripsi.ipynb        # Full walkthrough: EDA, preprocessing, alpha tuning, CV, evaluation
 ├── app.py                # Streamlit demo app
 ├── preprocessing.py       # Text cleaning / tokenizing / stopword removal / stemming
-├── bow.py                 # CountVectorizer training + Bag-of-Words transforms
 ├── mnb.py                 # MultinomialNB train / evaluate / save helpers
 ├── kfold_cv.py             # K-fold cross-validation
 ├── find_best_alpha.py      # Alpha sweep result comparison
