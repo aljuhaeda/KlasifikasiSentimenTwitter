@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+.env
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# Office lock files
+~$*.xlsx
+~$*.docx
+~$*.pptx
+.~lock.*#
+
+# Logs
+*.log
+process_log.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Model artifacts (optional — remove if you want to keep the trained model in repo)
+# *.pkl
+# *.h5
