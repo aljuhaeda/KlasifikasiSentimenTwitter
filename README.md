@@ -50,7 +50,7 @@ Al Juhaeda, Z. I. (2024). *Sentiment Analysis of Hate Speech in Twitter Comments
 
 ## Demo
 
-`app.py` is a Streamlit app: paste a tweet, get a Negatif/Positif prediction with class probabilities, plus an expandable breakdown of every preprocessing step (cleaning → tokenizing → stopword removal → stemming → Bag-of-Words) and the top contributing words per class.
+**Live**: [klasifikasisentimentwitter.streamlit.app](https://klasifikasisentimentwitter.streamlit.app/) — paste a tweet, get a Negatif/Positif prediction with class probabilities, plus an expandable breakdown of every preprocessing step (cleaning → tokenizing → stopword removal → stemming → Bag-of-Words) and the top contributing words per class.
 
 Run it locally:
 
@@ -104,7 +104,7 @@ Open `skripsi.ipynb` and run all cells — it downloads required NLTK resources 
 - [x] 10-fold cross-validation
 - [x] Streamlit demo app
 - [x] Published (JISMAN Journal, Nov 2024)
-- [ ] Deployed demo (see repo — not yet live on Streamlit Community Cloud)
+- [x] Deployed (Streamlit Community Cloud)
 
 ## License
 
