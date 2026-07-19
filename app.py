@@ -10,10 +10,12 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import os
 
-# Pastikan Anda telah mengunduh data NLTK sebelumnya
-# Jika belum, uncomment baris berikut dan jalankan sekali
-# nltk.download('punkt')
-# nltk.download('stopwords')
+# Mengunduh data NLTK yang dibutuhkan (aman dijalankan berulang kali - nltk akan skip jika sudah ada)
+for resource in ['punkt', 'punkt_tab', 'stopwords']:
+    try:
+        nltk.download(resource, quiet=True)
+    except Exception:
+        pass
 
 # Mengatur konfigurasi halaman
 st.set_page_config(
