@@ -18,8 +18,9 @@ Cloud free tier — sleeps after inactivity, wakes on first visit).
 - Buried thesis-machine leftover (`skripsinew.ipynb`, broken/abandoned
   refactor) removed from the repo.
 - README explicit about `train_model.py` being a non-reproducible legacy
-  script with hardcoded local paths — points readers to `skripsi.ipynb`
-  instead of letting them hit that trap.
+  script with hardcoded local paths, and that `skripsi.ipynb` carries
+  the same local-path pattern in several cells and needs updating for
+  a new machine before rerunning.
 
 ## In progress
 - Nothing currently active.
