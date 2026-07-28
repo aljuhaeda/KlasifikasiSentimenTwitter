@@ -11,10 +11,10 @@ Cloud free tier — sleeps after inactivity, wakes on first visit).
   across 3 train/test splits, validated with 10-fold CV.
 - Published: Al Juhaeda, Z. I. (2024), *Sentiment Analysis of Hate Speech
   in Twitter Comments Using Naïve Bayes Classifier*, JISMAN Journal.
-- Deployed config deliberately trades 1% accuracy (84% → 83%) for +18pp
-  hate-speech recall (0.14 → 0.32) — chosen specifically because the
-  highest-accuracy config was the worst at catching actual hate speech.
-  Documented as the central finding, not a footnote.
+- Deployed config deliberately trades 1% accuracy (84% → 83%) for +4pp
+  hate-speech recall (0.14 → 0.18) over the highest-accuracy config —
+  chosen specifically because that config was the worst at catching
+  actual hate speech. Documented as the central finding, not a footnote.
 - Buried thesis-machine leftover (`skripsinew.ipynb`, broken/abandoned
   refactor) removed from the repo.
 - README explicit about `train_model.py` being a non-reproducible legacy
@@ -27,9 +27,9 @@ Cloud free tier — sleeps after inactivity, wakes on first visit).
 ## Known issues / honest limitations
 - Small dataset (~1,200 tweets) with real class imbalance — caps how
   well the minority (hate-speech) class can be learned.
-- Even the best deployed config still misses ~2 in 3 real hate-speech
-  tweets (recall 0.32) — stated plainly in the README's Key Finding
-  section, not glossed over.
+- The deployed config misses ~4 in 5 real hate-speech tweets (recall
+  0.18) — stated plainly in the README's Key Finding section, not
+  glossed over.
 - Bag-of-Words + Naive Bayes has no notion of word order — structurally
   can't catch sarcasm, negation, or indirect hate speech.
 - Free-tier Streamlit hosting sleeps after inactivity (cold start ~20-30s).

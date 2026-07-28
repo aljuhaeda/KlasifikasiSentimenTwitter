@@ -23,19 +23,19 @@ Full walkthrough is in [`skripsi.ipynb`](skripsi.ipynb).
 
 ## Results
 
-Headline accuracy tops out at **84%** (`alpha=3.0`, 70/30 split), but accuracy is the wrong number to optimize here — see Key Finding below. The demo app ships with **`alpha=2.0`, 80/20 split**, chosen for the best hate-speech recall among every tested configuration, not the best accuracy:
+Headline accuracy tops out at **84%** (`alpha=3.0`, 70/30 split), but accuracy is the wrong number to optimize here — see Key Finding below. The demo app ships with **`alpha=2.0`, 80/20 split**:
 
 | Config | Accuracy | Positif (hate speech) Recall | Positif F1 |
 |---|---|---|---|
 | alpha=3.0, 70/30 (highest accuracy) | 0.84 | 0.14 | 0.21 |
+| **alpha=2.0, 80/20 (deployed)** | 0.83 | **0.18** | **0.25** |
 | alpha=1.0, 80/20 | 0.82 | 0.26 | 0.32 |
-| **alpha=2.0, 80/20 (deployed)** | 0.83 | **0.32** | **0.38** |
 
 Full sweep across every alpha × split combination tested is in `csv/accuracy_*.csv` and `csv/classification_report_*.csv`.
 
 ## Key Finding / Limitation
 
-**Class imbalance is the real bottleneck, not the algorithm — and optimizing for accuracy alone makes the actual problem worse.** The alpha that maximizes headline accuracy (3.0) has the *worst* recall on the `Positif` (hate speech) class of any tuned configuration — it does well by predicting `Negatif` almost every time, since that's the majority class. A hate-speech filter that catches 14% of real hate speech is not a useful filter, regardless of its accuracy score. `alpha=2.0` is a meaningfully better trade-off (recall 0.32 vs 0.14) at essentially no accuracy cost, which is why it's what the demo actually runs. This tension — and the fact that even the best config still misses roughly 2 in 3 real hate-speech tweets — is the central limitation, documented in the published paper, not glossed over.
+**Class imbalance is the real bottleneck, not the algorithm — and optimizing for accuracy alone makes the actual problem worse.** The alpha that maximizes headline accuracy (3.0) has the *worst* recall on the `Positif` (hate speech) class of any tuned configuration — it does well by predicting `Negatif` almost every time, since that's the majority class. A hate-speech filter that catches 14% of real hate speech is not a useful filter, regardless of its accuracy score. This tension — and the fact that the deployed config still misses roughly 4 in 5 real hate-speech tweets — is the central limitation, documented in the published paper, not glossed over.
 
 ## Publication
 
@@ -78,7 +78,7 @@ KlasifikasiSentimenTwitter/
 └── requirements.txt
 ```
 
-**Note on `train_model.py`:** this is a leftover standalone script with hardcoded local file paths from the original thesis machine (`C:\SkripsiFix\...`) — it's not part of the reproducible flow above. Reproduce results via `skripsi.ipynb`, which uses relative paths.
+**Note on `train_model.py`:** this is a leftover standalone script with hardcoded local file paths from the original thesis machine (`C:\SkripsiFix\...`) — it's not part of the reproducible flow above. `skripsi.ipynb` still has the same hardcoded `C:\SkripsiFix\...` paths in several cells (a path-swap to relative paths, matching what the deployed `app.py` already does via `os.path.join(base_dir, ...)`, hasn't been done here) — update those paths for your own machine before rerunning the notebook.
 
 ## Reproduction
 
