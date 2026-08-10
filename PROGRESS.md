@@ -21,6 +21,8 @@ Cloud free tier — sleeps after inactivity, wakes on first visit).
   script with hardcoded local paths, and that `skripsi.ipynb` carries
   the same local-path pattern in several cells and needs updating for
   a new machine before rerunning.
+- Removed a stray 1,882-line `process_log.log` that had been committed to
+  the repo, and added it to `.gitignore` (2026-07-31).
 
 ## In progress
 - Nothing currently active.
@@ -40,6 +42,8 @@ Cloud free tier — sleeps after inactivity, wakes on first visit).
   skill checked — N/A, diff-based and nothing to review. Live demo woken
   from sleep; `api/v2/app/resume` returned 204 and all core widget JS
   assets loaded with 200s, no console errors.
+- 2026-07-31: found and removed the committed `process_log.log` while
+  auditing repos for leaked files.
 
 ## Next up
 - Nothing scheduled.
