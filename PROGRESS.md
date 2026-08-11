@@ -44,6 +44,8 @@ Cloud free tier — sleeps after inactivity, wakes on first visit).
   assets loaded with 200s, no console errors.
 - 2026-07-31: found and removed the committed `process_log.log` while
   auditing repos for leaked files.
+- 2026-08-11: reviewed commits since last check (README screenshot only)
+  — no app/model code changed, status unaffected.
 
 ## Next up
 - Nothing scheduled.
