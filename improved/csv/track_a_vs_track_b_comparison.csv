@@ -1,0 +1,13 @@
+track,ratio,config,alpha,accuracy,positif_precision,positif_recall,positif_f1
+A (original methodology),70_30,maksimal,2.0,0.7151,0.7097,0.7979,0.7512
+A (original methodology),70_30,minimal,0.8,0.7039,0.7122,0.7565,0.7337
+A (original methodology),80_20,maksimal,1.0,0.6987,0.708,0.7519,0.7293
+A (original methodology),80_20,minimal,0.8,0.6987,0.7143,0.7364,0.7252
+A (original methodology),90_10,maksimal,1.0,0.6917,0.7188,0.7077,0.7132
+A (original methodology),90_10,minimal,0.8,0.7083,0.7344,0.7231,0.7287
+B (fixed methodology),70_30,bow,3.0,0.8408,0.5833,0.1186,0.1972
+B (fixed methodology),70_30,tfidf,2.0,0.8352,0.0,0.0,0.0
+B (fixed methodology),80_20,bow,0.01,0.8159,0.381,0.2051,0.2667
+B (fixed methodology),80_20,tfidf,1.0,0.8368,0.0,0.0,0.0
+B (fixed methodology),90_10,bow,0.01,0.7917,0.3529,0.3,0.3243
+B (fixed methodology),90_10,tfidf,2.0,0.8333,0.0,0.0,0.0
