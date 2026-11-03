@@ -201,9 +201,10 @@ Cloud free tier — sleeps after inactivity, wakes on first visit).
     still change loading behaviour.
     **Update (2026-11-03, later):** `requirements.txt` now pins
     `scikit-learn==1.9.0` (the version shown above to match the 1.5.1
-    pickles exactly) along with the other listed packages. Committed
-    locally, not pushed: these pins need Python 3.11 or newer on Streamlit
-    Cloud, which can't be checked from here.
+    pickles exactly) along with the other listed packages. Pushed later
+    the same day (`69bbebb`, with the caption commit); the demo rebuilt and
+    showed the caption. These pins need Python 3.11 or newer on Streamlit
+    Cloud, whose setting still can't be read from here.
   - Close-out: code-reviewer (no blocking issues), security-review (no
     findings; reviewed by hand because the skill's git context ran in
     another directory), simplify (trimmed the now-unused
@@ -221,7 +222,6 @@ Cloud free tier — sleeps after inactivity, wakes on first visit).
   current alpha=2.0/80:20 re-fit leak-free gives 0.8170 / 0.1316; a
   recall-oriented pick (70:30, alpha=0.4) gives 0.8291 accuracy with
   0.3103 Positif (non-hate) recall.
-- Not done (outside the 2026-11-03 scope): the `requirements.txt` pins
-  (scikit-learn 1.9.0 etc.) are committed locally but not pushed. Check
-  the app's Python setting in Streamlit Cloud (needs 3.11+), then push and
-  confirm the app boots.
+- Note: the `requirements.txt` pins (scikit-learn 1.9.0 etc.) are pushed
+  and the demo rebuilt after them. Still unchecked: the app's Python
+  setting in Streamlit Cloud (the pins need 3.11+).
