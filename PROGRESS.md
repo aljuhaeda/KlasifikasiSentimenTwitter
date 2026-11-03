@@ -139,6 +139,17 @@ Cloud free tier — sleeps after inactivity, wakes on first visit).
   - Paper arithmetic: the mean of Table 10's ten fold accuracies is
     79.54%, not the stated 79.09%; Table 3 P/R/F1 are support-weighted
     averages (recall = accuracy). Details in `ERRATA.md`.
+  - Majority-class baseline (always Negatif): 0.8352 / 0.8368 / 0.8333
+    on the original test sets, 0.8348 / 0.8383 / 0.8376 on the leak-free
+    ones. No leak-free config beats it on accuracy. Original 70:30
+    alpha=2.0/3.0 (0.8352) equals the baseline exactly; the deployed
+    0.8285 is below it.
+  - CV caveat: 13 / 16 / 18 within-train duplicates after preprocessing
+    can split across KFold folds (not grouped), so CV means are slightly
+    optimistic.
+  - `pickle/countvectorizer.pkl` (loaded by app.py) and
+    `pickle/count_vectorizer.pkl` (written by the notebook) have
+    identical vocabularies.
   - `openpyxl==3.1.5` installed in `.venv` and added to
     `requirements.txt`; `pd.read_excel('dataset.xlsx')` now loads (1200, 2).
 
@@ -150,8 +161,10 @@ Cloud free tier — sleeps after inactivity, wakes on first visit).
   ~4 in 5 hate-speech tweets") depend on it, and were left as they are.
 - **Decision for the owner: deployed demo config.** Switching the demo
   to a leak-free config is left to the owner (no model or app change
-  made). Trade-off on leak-free numbers: the CV-accuracy pick (alpha=3.0)
-  reaches ~0.82-0.83 accuracy but only ~0.09-0.11 Positif recall; the
+  made). Trade-off on leak-free numbers, where the always-Negatif
+  baseline is ~0.835-0.838 and no config beats it on accuracy: the
+  CV-accuracy pick (alpha=3.0) gives ~0.82-0.83 accuracy with only
+  ~0.09-0.11 Positif recall; the
   current alpha=2.0/80:20 re-fit leak-free gives 0.8170 / 0.1316; a
   recall-oriented pick (70:30, alpha=0.4) gives 0.8291 accuracy with
   0.3103 Positif recall.

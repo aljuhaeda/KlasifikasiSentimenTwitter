@@ -103,9 +103,15 @@ def main():
         train_texts = set(X_tr)
         keep = ~X_te.isin(train_texts)
         n_dup = int((~keep).sum())
+        base_orig = (y_te == 'Negatif').mean()
         X_te, y_te = X_te[keep], y_te[keep]
         out(f'=== ratio {ratio}: train {len(X_tr)}, test {len(keep)} -> {len(X_te)} '
             f'after removing {n_dup} test rows duplicating a training row (post-preprocessing)')
+        out(f'  majority-class baseline (always Negatif): {base_orig:.4f} on the original '
+            f'{len(keep)}-row test set, {(y_te == "Negatif").mean():.4f} on the {len(X_te)}-row leak-free test set')
+        n_dup_tr = int(X_tr.duplicated().sum())
+        out(f'  caveat: {n_dup_tr} training rows duplicate another training row after preprocessing; '
+            f'these can fall in different CV folds (plain KFold, not grouped)')
 
         # F1 for the Positif label needs an explicit pos_label with string labels.
         grid = GridSearchCV(

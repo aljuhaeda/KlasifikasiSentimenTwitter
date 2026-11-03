@@ -6,6 +6,8 @@ Class names are the dataset labels (Positif / Negatif); see README for what each
 rows: 1200 raw -> 1191 after drop_duplicates(); class counts {'Negatif': 995, 'Positif': 196}
 
 === ratio 70_30: train 833, test 358 -> 351 after removing 7 test rows duplicating a training row (post-preprocessing)
+  majority-class baseline (always Negatif): 0.8352 on the original 358-row test set, 0.8348 on the 351-row leak-free test set
+  caveat: 13 training rows duplicate another training row after preprocessing; these can fall in different CV folds (plain KFold, not grouped)
   CV on training portion only, per alpha (mean accuracy / mean F1 Positif):
     alpha 0.01 : 0.7875 / 0.1297
     alpha 0.1  : 0.7766 / 0.1414
@@ -28,6 +30,8 @@ rows: 1200 raw -> 1191 after drop_duplicates(); class counts {'Negatif': 995, 'P
     10-fold CV on training portion (vectorizer fit inside each fold): mean accuracy 0.7863 (std 0.0440)
 
 === ratio 80_20: train 952, test 239 -> 235 after removing 4 test rows duplicating a training row (post-preprocessing)
+  majority-class baseline (always Negatif): 0.8368 on the original 239-row test set, 0.8383 on the 235-row leak-free test set
+  caveat: 16 training rows duplicate another training row after preprocessing; these can fall in different CV folds (plain KFold, not grouped)
   CV on training portion only, per alpha (mean accuracy / mean F1 Positif):
     alpha 0.01 : 0.8131 / 0.2213
     alpha 0.1  : 0.8110 / 0.2718
@@ -54,6 +58,8 @@ rows: 1200 raw -> 1191 after drop_duplicates(); class counts {'Negatif': 995, 'P
     10-fold CV on training portion (vectorizer fit inside each fold): mean accuracy 0.8278 (std 0.0295)
 
 === ratio 90_10: train 1071, test 120 -> 117 after removing 3 test rows duplicating a training row (post-preprocessing)
+  majority-class baseline (always Negatif): 0.8333 on the original 120-row test set, 0.8376 on the 117-row leak-free test set
+  caveat: 18 training rows duplicate another training row after preprocessing; these can fall in different CV folds (plain KFold, not grouped)
   CV on training portion only, per alpha (mean accuracy / mean F1 Positif):
     alpha 0.01 : 0.8058 / 0.2316
     alpha 0.1  : 0.8011 / 0.2664

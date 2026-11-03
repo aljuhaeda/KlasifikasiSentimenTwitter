@@ -29,7 +29,7 @@ Headline accuracy tops out at **84%** (`alpha=3.0`, 70/30 split), but accuracy i
 
 | Config | Accuracy | Positif (hate speech) Recall | Positif F1 |
 |---|---|---|---|
-| alpha=3.0, 70/30 (highest accuracy) | 0.84 | 0.14 | 0.21 |
+| alpha=3.0, 70/30 (highest accuracy, tied with alpha=2.0) | 0.84 | 0.14 | 0.21 |
 | alpha=2.0, 70/30 | 0.84 | 0.20 | 0.29 |
 | **alpha=2.0, 80/20 (deployed)** | 0.83 | **0.18** | **0.25** |
 | alpha=1.0, 80/20 | 0.82 | 0.26 | 0.32 |
@@ -60,6 +60,8 @@ The figures in the published paper (JISMEDIA, July 2024) and in the Results tabl
 | 80:20, alpha=2.0 (deployed config), accuracy | 0.83 | 0.8170 (235 test rows) |
 | 80:20, alpha=2.0, Positif precision / recall / F1 | 0.44 / 0.18 / 0.25 | 0.33 / 0.13 / 0.19 |
 | Alpha picked by CV accuracy, per ratio | — | 3.0 for all three ratios; test accuracy 0.8319 / 0.8298 / 0.8205 (70:30 / 80:20 / 90:10), Positif recall 0.09 / 0.11 / 0.11 |
+
+**Majority-class baseline.** Predicting `Negatif` for every row scores 0.8352 / 0.8368 / 0.8333 on the original 70:30 / 80:20 / 90:10 test sets, and 0.8348 / 0.8383 / 0.8376 on the leak-free ones. Every leak-free accuracy above is at or below this baseline. In the original pipeline, alpha=2.0 and alpha=3.0 at 70:30 score exactly the baseline (0.8352), and the deployed config's 0.8285 is below its baseline of 0.8368.
 
 The paper's 85% (90:10, alpha=1.0) and 79.09% CV figures are not reproduced by this repo's current code. The committed results for that setting give 0.78, and a fresh re-run of the original code gives 0.79. The paper's results appear to come from a different run or configuration than the one committed here.
 

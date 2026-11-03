@@ -30,12 +30,16 @@ Fixed configurations, scored on the same leak-free splits:
 | 90:10, alpha=1.0 (paper's Model F) | 0.7949 | 0.2222 / 0.1053 / 0.1429 | 0.8085 |
 | 70:30, alpha=0.4 (best CV F1(Positif), secondary criterion) | 0.8291 | 0.4737 / 0.3103 / 0.3750 | 0.7863 |
 
+**Majority-class baseline (always `Negatif`).** On the leak-free test sets this scores 0.8348 / 0.8383 / 0.8376 (70:30 / 80:20 / 90:10). On the original test sets it scores 0.8352 / 0.8368 / 0.8333. No leak-free configuration above beats it on accuracy. In the original pipeline, alpha=2.0 and 3.0 at 70:30 (0.8352) equal the baseline, and the deployed 80:20 alpha=2.0 (0.8285) is below it. Accuracy is therefore not informative here; the per-class figures are.
+
+**CV caveat.** 13 / 16 / 18 training rows (70:30 / 80:20 / 90:10) duplicate another training row after preprocessing. Plain `KFold` can place such pairs in different folds, so the CV means are slightly optimistic. Grouped folds were not used, to keep the folds identical to `kfold_cv.py`.
+
 Selecting alpha by CV accuracy pushes it to the top of the grid (3.0) at every ratio, and Positif recall drops to about 0.09–0.11. Selecting by CV F1(Positif) picks 0.4–0.5 instead. At 70:30 that gives Positif recall 0.31 with test accuracy 0.83. At 80:20 it gives recall 0.26 with accuracy 0.79. At 90:10 (alpha=0.4) recall stays at 0.11 and accuracy falls to 0.77, but that test set has only 19 Positif rows.
 
 ## 3. Published figures this repo's code does not reproduce
 
 - **Model F (90:10, alpha=1.0): accuracy 85%.** The committed `csv/accuracy_alpha_1.0_tuning_maksimal_ratio_90_10.csv` gives 0.78. A fresh re-run of the original pipeline gives 0.7917 on 120 test rows; the paper reports 119. The leak-free figure is 0.7949.
-- **Table 3 precision / recall / F1.** These match support-weighted averages of the per-class values in Tables 4–9. For Model F, the class values 60/16/25 (Positive) and 86/98/92 (Negative) with about 19/100 support give 82 / 85 / 81, and recall then equals accuracy. Per-class figures are the ones to compare with the table above.
+- **Table 3 precision / recall / F1.** For all six models these match support-weighted averages of the per-class values in Tables 4–9 to within about one point, and recall equals accuracy in every row. The check assumed stratified supports of about 16.5% Positive. For Model F, the class values 60/16/25 (Positive) and 86/98/92 (Negative) with about 19/100 support give 82 / 85 / 81, and recall then equals accuracy. Per-class figures are the ones to compare with the table above.
 - **10-fold CV mean 79.09%, best fold 85.05%.** The paper does not state which model or split the CV used. Nine of the ten fold accuracies are whole-number fractions of 107 or 108 rows, which fits 10 folds of a 1,071-row (90:10) training portion; fold 8 (78.38%) fits neither. The arithmetic mean of the ten listed fold accuracies is 79.54%, not 79.09%. The repo's committed `cv_mean_*` CSVs give 0.75–0.80.
 - **Dataset size.** The paper reports 1,190 tweets. `dataset.xlsx` has 1,200 rows, which become 1,191 after `drop_duplicates()`.
 
