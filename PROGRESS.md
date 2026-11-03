@@ -24,6 +24,10 @@ Cloud free tier — sleeps after inactivity, wakes on first visit).
 - Leak-free re-evaluation (`eval_leakfree.py` → `results_leakfree.txt`),
   README "Reproducibility note" and `ERRATA.md` added 2026-11-03;
   published figures and original artifacts left unchanged.
+- Label meaning corrected repo-wide (`Positif` = non-hate, `Negatif` =
+  hate; Key Finding rewritten), app.py preprocessing switched to
+  `preprocessing.py` (proven identical to training on all 1,200 rows),
+  pickle version warning shown benign — 2026-11-03, see verification log.
 - Buried thesis-machine leftover (`skripsinew.ipynb`, broken/abandoned
   refactor) removed from the repo.
 - README explicit about `train_model.py` being a non-reproducible legacy

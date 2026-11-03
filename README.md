@@ -11,7 +11,7 @@ Multinomial Naive Bayes classifier detecting hate speech directed at Islam in In
 
 ## Overview
 
-**Problem.** Automatically flagging hate speech against religious groups on social media is a narrow, high-stakes text classification task: in this dataset hate speech is the majority (83.5% of rows), so the hard part is recognising the minority of non-hate tweets about Islam, the language is informal Indonesian Twitter text, and errors in both directions matter: missed hate speech, and non-hate tweets wrongly flagged as hate (false alarms).
+**Problem.** Automatically flagging hate speech against religious groups on social media is a narrow, high-stakes text classification task: the classes are imbalanced (in this dataset hate speech is the majority, 83.5% of rows, so the minority class is non-hate tweets about Islam), the language is informal Indonesian Twitter text, and a false negative (missing real hate speech) is more costly than a false positive.
 
 **Approach.**
 
@@ -40,7 +40,7 @@ Full sweep across every alpha × split combination tested is in `csv/accuracy_*.
 
 ## Key Finding / Limitation
 
-**Class imbalance is the real bottleneck, not the algorithm — and optimizing for accuracy alone makes the actual problem worse.** `Negatif` (hate speech) is the majority class, and the model leans heavily towards it. Hate-speech recall is high: 0.96 for the deployed alpha=2.0/80:20 config with precision 0.86 (original pipeline), and 0.9492 with precision 0.8500 when that config is re-fit leak-free. The minority `Positif` (non-hate) class is mostly misclassified as hate: the deployed config recognises only 0.18 of non-hate tweets (0.1316 leak-free), and the alpha that maximizes headline accuracy (3.0) recognises 0.14 at 70/30 (0.09–0.11 leak-free). So the practical limitation is false alarms: roughly 4 in 5 non-hate tweets about Islam get flagged as hate speech. Accuracy hides this, because always predicting `Negatif` already scores 0.833–0.838 on these test sets, and no configuration beats that baseline: the original 70/30 alpha=2.0/3.0 equal it (0.8352), the deployed config is below it (0.8285 vs 0.8368), and every leak-free accuracy is at or below it (see Reproducibility note).
+**Class imbalance is the real bottleneck, not the algorithm — and optimizing for accuracy alone makes the actual problem worse.** `Negatif` (hate speech) is the majority class, and the model leans heavily towards it. Hate-speech recall is high: 0.96 for the deployed alpha=2.0/80:20 config with precision 0.86 (original pipeline), and 0.9492 with precision 0.8500 when that config is re-fit leak-free. The minority `Positif` (non-hate) class is mostly misclassified as hate: the deployed config recognises only 0.18 of non-hate tweets (0.1316 leak-free), and the alpha that maximizes headline accuracy (3.0) recognises 0.14 at 70/30 (0.09–0.11 leak-free). So the practical limitation is false alarms: roughly 4 in 5 non-hate tweets about Islam get flagged as hate speech. Accuracy hides this, because always predicting `Negatif` already scores 0.833–0.838 on these test sets, and no configuration in this repo's committed runs beats that baseline (the paper's unreproduced 85% is the exception): the original 70/30 alpha=2.0/3.0 equal it (0.8352), as does 80/20 alpha=3.0 (0.8368), the deployed config is below it (0.8285 vs 0.8368), and every leak-free accuracy is at or below it (see Reproducibility note).
 
 ## Reproducibility note
 
