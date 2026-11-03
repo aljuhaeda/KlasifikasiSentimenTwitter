@@ -37,6 +37,15 @@ st.markdown("""
 Aplikasi web sederhana untuk mengklasifikasikan teks ujaran kebencian terhadap agama Islam pada platform Twitter menggunakan metode Multinomial Naive Bayes, oleh Zul Iflah Al Juhaeda. 📝
 """)
 
+# Keterbatasan model (angka dari README, bagian Reproducibility note / ERRATA.md)
+st.caption(
+    "⚠️ **Keterbatasan:** model ini jauh lebih baik mengenali tweet ujaran kebencian (Negatif) "
+    "daripada tweet bukan ujaran kebencian (Positif). Hanya sekitar 13–18% tweet Positif yang "
+    "dikenali dengan benar, sisanya diprediksi sebagai Negatif (13% pada evaluasi ulang tanpa "
+    "kebocoran data, 18% pada evaluasi asli). Akurasi keseluruhan tidak melampaui baseline "
+    "\"selalu Negatif\" (sekitar 83–84%). Detail ada di README."
+)
+
 # Fungsi untuk memuat model dengan caching_resource
 @st.cache_resource
 def load_model(path):
