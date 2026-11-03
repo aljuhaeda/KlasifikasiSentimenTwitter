@@ -1,0 +1,81 @@
+Leak-free re-evaluation, KlasifikasiSentimenTwitter
+python 3.14.7, scikit-learn 1.9.0, numpy 2.5.2, pandas 3.0.5, nltk 3.10.2
+seed 42 (train_test_split stratified, KFold shuffle); alpha grid [0.01, 0.1, 0.4, 0.5, 0.6, 0.8, 1.0, 2.0, 3.0]
+Class names are the dataset labels (Positif / Negatif); see README for what each label means.
+
+rows: 1200 raw -> 1191 after drop_duplicates(); class counts {'Negatif': 995, 'Positif': 196}
+
+=== ratio 70_30: train 833, test 358 -> 351 after removing 7 test rows duplicating a training row (post-preprocessing)
+  CV on training portion only, per alpha (mean accuracy / mean F1 Positif):
+    alpha 0.01 : 0.7875 / 0.1297
+    alpha 0.1  : 0.7766 / 0.1414
+    alpha 0.4  : 0.7863 / 0.1863
+    alpha 0.5  : 0.7887 / 0.1805
+    alpha 0.6  : 0.7910 / 0.1815
+    alpha 0.8  : 0.7983 / 0.1741
+    alpha 1.0  : 0.8007 / 0.1586
+    alpha 2.0  : 0.8271 / 0.1172
+    alpha 3.0  : 0.8295 / 0.0607
+  alpha chosen by CV accuracy (primary, same criterion as original): 3.0
+  alpha chosen by CV F1(Positif) (secondary): 0.4
+  alpha=3.0 [CV-accuracy pick]: test accuracy 0.8319 (n_test=351)
+    Negatif  precision 0.8441  recall 0.9795  F1 0.9068  support 293
+    Positif  precision 0.4545  recall 0.0862  F1 0.1449  support 58
+    10-fold CV on training portion (vectorizer fit inside each fold): mean accuracy 0.8295 (std 0.0465)
+  alpha=0.4 [CV-F1(Positif) pick]: test accuracy 0.8291 (n_test=351)
+    Negatif  precision 0.8722  recall 0.9317  F1 0.9010  support 293
+    Positif  precision 0.4737  recall 0.3103  F1 0.3750  support 58
+    10-fold CV on training portion (vectorizer fit inside each fold): mean accuracy 0.7863 (std 0.0440)
+
+=== ratio 80_20: train 952, test 239 -> 235 after removing 4 test rows duplicating a training row (post-preprocessing)
+  CV on training portion only, per alpha (mean accuracy / mean F1 Positif):
+    alpha 0.01 : 0.8131 / 0.2213
+    alpha 0.1  : 0.8110 / 0.2718
+    alpha 0.4  : 0.8046 / 0.2775
+    alpha 0.5  : 0.8078 / 0.2894
+    alpha 0.6  : 0.8088 / 0.2802
+    alpha 0.8  : 0.8141 / 0.2695
+    alpha 1.0  : 0.8131 / 0.2473
+    alpha 2.0  : 0.8278 / 0.2039
+    alpha 3.0  : 0.8299 / 0.0880
+  alpha chosen by CV accuracy (primary, same criterion as original): 3.0
+  alpha chosen by CV F1(Positif) (secondary): 0.5
+  alpha=3.0 [CV-accuracy pick]: test accuracy 0.8298 (n_test=235)
+    Negatif  precision 0.8489  recall 0.9695  F1 0.9052  support 197
+    Positif  precision 0.4000  recall 0.1053  F1 0.1667  support 38
+    10-fold CV on training portion (vectorizer fit inside each fold): mean accuracy 0.8299 (std 0.0346)
+  alpha=0.5 [CV-F1(Positif) pick]: test accuracy 0.7872 (n_test=235)
+    Negatif  precision 0.8621  recall 0.8883  F1 0.8750  support 197
+    Positif  precision 0.3125  recall 0.2632  F1 0.2857  support 38
+    10-fold CV on training portion (vectorizer fit inside each fold): mean accuracy 0.8078 (std 0.0223)
+  alpha=2.0 [fixed: deployed config]: test accuracy 0.8170 (n_test=235)
+    Negatif  precision 0.8500  recall 0.9492  F1 0.8969  support 197
+    Positif  precision 0.3333  recall 0.1316  F1 0.1887  support 38
+    10-fold CV on training portion (vectorizer fit inside each fold): mean accuracy 0.8278 (std 0.0295)
+
+=== ratio 90_10: train 1071, test 120 -> 117 after removing 3 test rows duplicating a training row (post-preprocessing)
+  CV on training portion only, per alpha (mean accuracy / mean F1 Positif):
+    alpha 0.01 : 0.8058 / 0.2316
+    alpha 0.1  : 0.8011 / 0.2664
+    alpha 0.4  : 0.8011 / 0.2983
+    alpha 0.5  : 0.8001 / 0.2918
+    alpha 0.6  : 0.7992 / 0.2903
+    alpha 0.8  : 0.8057 / 0.2917
+    alpha 1.0  : 0.8085 / 0.2738
+    alpha 2.0  : 0.8225 / 0.2102
+    alpha 3.0  : 0.8272 / 0.1286
+  alpha chosen by CV accuracy (primary, same criterion as original): 3.0
+  alpha chosen by CV F1(Positif) (secondary): 0.4
+  alpha=3.0 [CV-accuracy pick]: test accuracy 0.8205 (n_test=117)
+    Negatif  precision 0.8468  recall 0.9592  F1 0.8995  support 98
+    Positif  precision 0.3333  recall 0.1053  F1 0.1600  support 19
+    10-fold CV on training portion (vectorizer fit inside each fold): mean accuracy 0.8272 (std 0.0383)
+  alpha=0.4 [CV-F1(Positif) pick]: test accuracy 0.7692 (n_test=117)
+    Negatif  precision 0.8381  recall 0.8980  F1 0.8670  support 98
+    Positif  precision 0.1667  recall 0.1053  F1 0.1290  support 19
+    10-fold CV on training portion (vectorizer fit inside each fold): mean accuracy 0.8011 (std 0.0342)
+  alpha=1.0 [fixed: paper's Model F setting]: test accuracy 0.7949 (n_test=117)
+    Negatif  precision 0.8426  recall 0.9286  F1 0.8835  support 98
+    Positif  precision 0.2222  recall 0.1053  F1 0.1429  support 19
+    10-fold CV on training portion (vectorizer fit inside each fold): mean accuracy 0.8085 (std 0.0381)
+

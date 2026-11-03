@@ -7,16 +7,23 @@ Cloud free tier — sleeps after inactivity, wakes on first visit).
 
 ## Done
 - Multinomial Naive Bayes hate-speech classifier for Indonesian-language
-  tweets, with lexicon augmentation and systematic alpha tuning (0.01-3.0)
-  across 3 train/test splits, validated with 10-fold CV.
+  tweets, with systematic alpha tuning (0.01-3.0) across 3 train/test
+  splits, validated with 10-fold CV. (The notebook's lexicon labelling
+  step is not used in training; corrected 2026-11-03.)
 - Published: Al Juhaeda, Z. I., Faisal, M., & Suhartono (2024),
   *Sentiment Classification of Hate Speech Against Islam on Twitter
   Platform Using Multinomial Naïve Bayes*, Journal of Informatics and
   Science Media (JISMEDIA), Vol. 1 Iss. 1, pp. 34–38, July 2024.
-- Deployed config deliberately trades 1% accuracy (84% → 83%) for +4pp
-  hate-speech recall (0.14 → 0.18) over the highest-accuracy config —
-  chosen specifically because that config was the worst at catching
-  actual hate speech. Documented as the central finding, not a footnote.
+- Deployed config is alpha=2.0 / 80:20 (original pipeline: acc 0.83,
+  Positif recall 0.18). The earlier rationale ("trades 1% accuracy for
+  +4pp recall over alpha=3.0/70:30") compared different test splits; on
+  the same 70:30 test set alpha=2.0 and 3.0 tie at 0.8352 with Positif
+  recall 0.20 vs 0.14 (corrected 2026-11-03, see README Results).
+- Citation corrected from "JISMAN Journal, Nov 2024" to JISMEDIA Vol. 1
+  Iss. 1, pp. 34-38, July 2024 (commit b0be3b5) — closed.
+- Leak-free re-evaluation (`eval_leakfree.py` → `results_leakfree.txt`),
+  README "Reproducibility note" and `ERRATA.md` added 2026-11-03;
+  published figures and original artifacts left unchanged.
 - Buried thesis-machine leftover (`skripsinew.ipynb`, broken/abandoned
   refactor) removed from the repo.
 - README explicit about `train_model.py` being a non-reproducible legacy
@@ -104,6 +111,47 @@ Cloud free tier — sleeps after inactivity, wakes on first visit).
     tweets). This repo's code gives 90_10 alpha=1.0 acc 0.7917 on 120
     test rows. The paper's results came from a different run or
     configuration than the one committed here.
+- 2026-11-03 (leak-free re-run): `.venv\Scripts\python.exe
+  eval_leakfree.py` → `results_leakfree.txt` (Python 3.14.7, sklearn
+  1.9.0, numpy 2.5.2, pandas 3.0.5, nltk 3.10.2; seed 42 for stratified
+  split and KFold(10, shuffle)). Run twice, outputs byte-identical.
+  Per ratio: split first; `Pipeline(CountVectorizer(max_features=1000),
+  MultinomialNB)` fit on train only; test rows whose preprocessed text
+  is in train dropped (7/4/3 → 351/235/117 test rows); alpha by 10-fold
+  CV accuracy on train over {0.01, 0.1, 0.4, 0.5, 0.6, 0.8, 1.0, 2.0,
+  3.0}; test scored once; CV refits the vectorizer per fold.
+  - CV-accuracy pick is alpha=3.0 at every ratio: test acc 0.8319 /
+    0.8298 / 0.8205 (70:30 / 80:20 / 90:10), Positif recall 0.0862 /
+    0.1053 / 0.1053, Positif F1 0.1449 / 0.1667 / 0.1600; CV mean
+    0.8295 / 0.8299 / 0.8272.
+  - Deployed config (80:20, alpha=2.0) re-fit leak-free: acc 0.8170,
+    Positif P/R/F1 0.3333 / 0.1316 / 0.1887, CV mean 0.8278 (original
+    pipeline: 0.83 / recall 0.18 / F1 0.25).
+  - Paper's Model F (90:10, alpha=1.0) leak-free: acc 0.7949, Positif
+    P/R/F1 0.2222 / 0.1053 / 0.1429, CV mean 0.8085 (paper: 85%, Positive
+    60/16/25; committed csv 0.78; fresh original-pipeline re-run 0.7917).
+  - Secondary (alpha by CV F1(Positif)): 70:30 alpha=0.4 → acc 0.8291,
+    Positif recall 0.3103, F1 0.3750; 80:20 alpha=0.5 → 0.7872 / 0.2632 /
+    0.2857; 90:10 alpha=0.4 → 0.7692 / 0.1053 / 0.1290.
+  - Leak counts re-checked: by row, 238/358 (70:30) and 119/239 (80:20)
+    test rows are another ratio's training rows (0/120 at 90:10); by
+    text match 241/122/3, matching the earlier entry.
+  - Paper arithmetic: the mean of Table 10's ten fold accuracies is
+    79.54%, not the stated 79.09%; Table 3 P/R/F1 are support-weighted
+    averages (recall = accuracy). Details in `ERRATA.md`.
+  - `openpyxl==3.1.5` installed in `.venv` and added to
+    `requirements.txt`; `pd.read_excel('dataset.xlsx')` now loads (1200, 2).
 
 ## Next up
-- Nothing scheduled.
+- **Decision for the owner: label meaning.** The paper (§2.1, Table 1)
+  defines `Positif` = non-hate, `Negatif` = hate against Islam; the
+  README calls `Positif` hate speech. Confirm which is right for
+  `dataset.xlsx`. The README's Results header and Key Finding ("misses
+  ~4 in 5 hate-speech tweets") depend on it, and were left as they are.
+- **Decision for the owner: deployed demo config.** Switching the demo
+  to a leak-free config is left to the owner (no model or app change
+  made). Trade-off on leak-free numbers: the CV-accuracy pick (alpha=3.0)
+  reaches ~0.82-0.83 accuracy but only ~0.09-0.11 Positif recall; the
+  current alpha=2.0/80:20 re-fit leak-free gives 0.8170 / 0.1316; a
+  recall-oriented pick (70:30, alpha=0.4) gives 0.8291 accuracy with
+  0.3103 Positif recall.
