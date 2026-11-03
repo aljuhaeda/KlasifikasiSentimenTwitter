@@ -41,7 +41,7 @@ Full sweep across every alpha × split combination tested is in `csv/accuracy_*.
 
 ## Publication
 
-Al Juhaeda, Z. I. (2024). *Sentiment Analysis of Hate Speech in Twitter Comments Using Naïve Bayes Classifier.* JISMAN Journal. [View on Garuda](https://garuda.kemdiktisaintek.go.id/documents/detail/4926421)
+Al Juhaeda, Z. I., Faisal, M., & Suhartono. (2024). *Sentiment Classification of Hate Speech Against Islam on Twitter Platform Using Multinomial Naïve Bayes.* Journal of Informatics and Science Media (JISMEDIA), 1(1), 34–38. [View on Garuda](https://garuda.kemdiktisaintek.go.id/documents/detail/4926421)
 
 ## Tech Stack
 
@@ -105,7 +105,7 @@ Open `skripsi.ipynb` and run all cells — it downloads required NLTK resources 
 - [x] Alpha tuning across 3 train/test splits
 - [x] 10-fold cross-validation
 - [x] Streamlit demo app
-- [x] Published (JISMAN Journal, Nov 2024)
+- [x] Published (JISMEDIA Vol. 1 Iss. 1, July 2024)
 - [x] Deployed (Streamlit Community Cloud)
 
 ## License
