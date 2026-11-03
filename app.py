@@ -1,15 +1,12 @@
 import streamlit as st
 import pickle
 import pandas as pd
-import re
 import nltk
-from nltk.corpus import stopwords
-from nltk.stem import PorterStemmer
-from nltk.tokenize import word_tokenize
 import os
+import preprocessing  # preprocessing yang sama dengan pipeline training
 
 # Mengunduh data NLTK yang dibutuhkan (aman dijalankan berulang kali - nltk akan skip jika sudah ada)
-for resource in ['punkt', 'punkt_tab', 'stopwords']:
+for resource in ['stopwords']:  # punkt tidak lagi dipakai (tokenisasi pakai split() dari preprocessing.py)
     try:
         nltk.download(resource, quiet=True)
     except Exception:
@@ -60,26 +57,10 @@ def load_vectorizer(path):
 
 # Fungsi Preprocessing
 def preprocess_text(text):
-    # Cleaning: Menghapus karakter non-alphanumerik
-    text_clean = re.sub(r'[^a-zA-Z\s]', '', text)
-    
-    # Case Folding: Mengubah semua huruf menjadi huruf kecil
-    text_lower = text_clean.lower()
-    
-    # Tokenizing: Memisahkan teks menjadi kata-kata
-    tokens = word_tokenize(text_lower)
-    
-    # Stopword Removal: Menghapus kata-kata umum yang tidak berpengaruh
-    stop_words = set(stopwords.words('indonesian'))  # Sesuaikan dengan bahasa yang digunakan
-    tokens_no_stop = [word for word in tokens if word not in stop_words]
-    
-    # Stemming: Mengubah kata ke bentuk dasarnya
-    stemmer = PorterStemmer()
-    tokens_stemmed = [stemmer.stem(word) for word in tokens_no_stop]
-    
-    # Menggabungkan kembali menjadi string
-    processed_text = ' '.join(tokens_stemmed)
-    
+    # Memanggil preprocessing.preprocess_text (sama persis dengan training):
+    # hapus URL/mention/#, hapus non-huruf, case folding, split(), stopword, stemming
+    text_clean, text_lower, tokens, tokens_no_stop, tokens_stemmed, processed_text = preprocessing.preprocess_text(text)
+
     return {
         "Original Text": text,
         "Cleaned Text": text_clean,
@@ -102,6 +83,12 @@ def get_top_features(model, vectorizer, class_label, top_n=10):
 base_dir = os.path.dirname(os.path.abspath(__file__))
 model_path = os.path.join(base_dir, 'pickle', 'mnb_alpha_2.0_tuning_maksimal_ratio_80_20.pkl')  # alpha=2.0/80_20: deployed config (see README, Results + Reproducibility note)
 vectorizer_path = os.path.join(base_dir, 'pickle', 'countvectorizer.pkl')  # Sesuaikan dengan nama file vectorizer Anda
+
+# Arti label dataset (paper Bagian 2.1, Tabel 1); hanya untuk tampilan
+LABEL_MEANING = {
+    'Positif': 'bukan ujaran kebencian terhadap Islam',
+    'Negatif': 'ujaran kebencian terhadap Islam',
+}
 
 # Area Input Teks dan Tombol Predict menggunakan layout columns
 col1, col2 = st.columns([3, 1])  # Membuat dua kolom, kolom pertama lebih lebar
@@ -157,7 +144,7 @@ if predict_button:
             result_col1, result_col2 = st.columns([2, 1])
             
             with result_col1:
-                st.success(f"Hasil Prediksi: **{prediction}**")
+                st.success(f"Hasil Prediksi: **{prediction}** ({LABEL_MEANING.get(prediction, '')})")
                 st.markdown("### **Probabilitas Prediksi:**")
                 st.write(prob_df)
             
@@ -213,6 +200,7 @@ if predict_button:
     st.subheader("Dataset")
     st.write("""
     Dataset yang digunakan terdiri dari sejumlah tweet yang dikumpulkan dari platform Twitter, masing-masing dilabeli sebagai 'Positif' atau 'Negatif'.
+    'Positif' = bukan ujaran kebencian terhadap Islam; 'Negatif' = ujaran kebencian terhadap Islam (sesuai definisi label pada paper, Bagian 2.1 dan Tabel 1).
     """)
     
     st.subheader("Pentingnya Klasifikasi Sentimen")

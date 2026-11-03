@@ -16,7 +16,7 @@ Command: `.venv\Scripts\python.exe eval_leakfree.py`, which writes `results_leak
 
 Method, per ratio: the split is made first. The vectorizer and MNB are fit as one `Pipeline` on the training portion only. Test rows whose preprocessed text appears in the training portion are dropped. Alpha is chosen by 10-fold CV accuracy on the training portion, over the grid 0.01, 0.1, 0.4, 0.5, 0.6, 0.8, 1.0, 2.0, 3.0 (the repo's grid plus the paper's 0.4 and 0.6). The test set is scored once. The CV mean refits the vectorizer inside each fold.
 
-| Ratio | Test rows | CV-accuracy alpha | Test acc | Positif P / R / F1 | Negatif P / R / F1 | CV mean acc |
+| Ratio | Test rows | CV-accuracy alpha | Test acc | Positif (non-hate) P / R / F1 | Negatif (hate) P / R / F1 | CV mean acc |
 |---|---|---|---|---|---|---|
 | 70:30 | 351 | 3.0 | 0.8319 | 0.4545 / 0.0862 / 0.1449 | 0.8441 / 0.9795 / 0.9068 | 0.8295 |
 | 80:20 | 235 | 3.0 | 0.8298 | 0.4000 / 0.1053 / 0.1667 | 0.8489 / 0.9695 / 0.9052 | 0.8299 |
@@ -24,7 +24,7 @@ Method, per ratio: the split is made first. The vectorizer and MNB are fit as on
 
 Fixed configurations, scored on the same leak-free splits:
 
-| Config | Test acc | Positif P / R / F1 | CV mean acc |
+| Config | Test acc | Positif (non-hate) P / R / F1 | CV mean acc |
 |---|---|---|---|
 | 80:20, alpha=2.0 (deployed config, re-fit leak-free) | 0.8170 | 0.3333 / 0.1316 / 0.1887 | 0.8278 |
 | 90:10, alpha=1.0 (paper's Model F) | 0.7949 | 0.2222 / 0.1053 / 0.1429 | 0.8085 |
@@ -46,10 +46,10 @@ Selecting alpha by CV accuracy pushes it to the top of the grid (3.0) at every r
 ## 4. Repo claims corrected on 2026-11-03
 
 - "Lexicon augmentation alongside Bag-of-Words features" (README). Cell 10 writes lexicon-derived labels to `*_with_classes.csv`, but training uses the manual labels and BoW features only, so the lexicon never reaches the model.
-- "NLTK stemming" (README). Stemming uses NLTK's English `PorterStemmer` on Indonesian text. Training tokenizes with `str.split()`; `app.py` uses `word_tokenize`.
+- "NLTK stemming" (README). Stemming uses NLTK's English `PorterStemmer` on Indonesian text. Training tokenizes with `str.split()`; `app.py` used `word_tokenize` and did not strip URLs/mentions. Since 2026-11-03 `app.py` calls `preprocessing.preprocess_text`, identical to training on all 1,200 dataset rows (see PROGRESS.md).
 - The deployed-config rationale compared rows from different test splits. On the same 70:30 test set, alpha=2.0 and alpha=3.0 both score 0.8352, and alpha=2.0 has Positif recall 0.20 against 0.14.
-- An `app.py` comment said alpha=2.0/80:20 has the "best hate-speech recall among tested configs". It does not: committed results give alpha=1.0/80:20 0.26 and alpha=0.5/70:30 0.36. Only the comment changed; app behaviour is the same.
+- An `app.py` comment said alpha=2.0/80:20 has the "best hate-speech recall among tested configs". (The "hate-speech recall" in that comment was `Positif` recall, which is non-hate recall; see section 5.) It does not: committed results give alpha=1.0/80:20 0.26 and alpha=0.5/70:30 0.36. Only the comment changed; app behaviour is the same.
 
-## 5. Open question for the owner: label meaning
+## 5. Label meaning (resolved 2026-11-03)
 
-The paper (Section 2.1, Table 1) defines `Positif` as non-hate speech and `Negatif` as hate speech against Islam. The README describes `Positif` as hate speech. In `dataset.xlsx`, `Negatif` is the majority label (995 of 1,191 rows). The README's Key Finding ("misses roughly 4 in 5 real hate-speech tweets") holds only under the README's definition. This file reports numbers per label name and does not resolve the question.
+The paper (Section 2.1, Table 1) defines `Positif` as non-hate speech toward Islam and `Negatif` as hate speech against Islam; `dataset.xlsx` follows this definition. `Negatif` is the majority label: 1,002 of 1,200 raw rows (83.5%), 995 of 1,191 after `drop_duplicates()`. Earlier versions of the README and PROGRESS described `Positif` as hate speech, which inverted the Key Finding. Under the correct labels, hate speech (`Negatif`) recall is high (for example 0.9492, precision 0.8500, for the deployed config re-fit leak-free), and the limitation is that most non-hate (`Positif`) tweets are classified as hate (recall 0.1316 for that config).

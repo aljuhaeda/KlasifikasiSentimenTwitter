@@ -38,10 +38,15 @@ Cloud free tier — sleeps after inactivity, wakes on first visit).
 
 ## Known issues / honest limitations
 - Small dataset (~1,200 tweets) with real class imbalance — caps how
-  well the minority (hate-speech) class can be learned.
-- The deployed config misses ~4 in 5 real hate-speech tweets (recall
-  0.18) — stated plainly in the README's Key Finding section, not
-  glossed over.
+  well the minority (`Positif`, non-hate) class can be learned.
+- Labels (paper §2.1, Table 1): `Positif` = non-hate, `Negatif` = hate
+  against Islam (1,002 / 1,200 rows, 83.5%). The deployed config catches
+  most hate speech (`Negatif` recall 0.96, precision 0.86 original;
+  0.9492 / 0.8500 leak-free) but flags ~4 in 5 non-hate tweets as hate
+  (`Positif` recall 0.18 original, 0.1316 leak-free). Accuracy is at or
+  below the always-`Negatif` baseline (0.833-0.838). Stated in the
+  README's Key Finding. (Earlier wording here called `Positif` the
+  hate-speech class; corrected 2026-11-03.)
 - Bag-of-Words + Naive Bayes has no notion of word order — structurally
   can't catch sarcasm, negation, or indirect hate speech.
 - Free-tier Streamlit hosting sleeps after inactivity (cold start ~20-30s).
@@ -102,7 +107,8 @@ Cloud free tier — sleeps after inactivity, wakes on first visit).
     the manual labels from `train_{ratio}.csv` and BoW features only.
     The lexicon never reaches the model, so the README's "lexicon
     augmentation alongside BoW features" isn't what the code does. The
-    `app.py` comment "best hate-speech recall among tested configs" for
+    `app.py` comment "best hate-speech recall among tested configs" (it
+    meant `Positif` recall, which is non-hate recall) for
     alpha=2.0/80_20 is wrong: alpha=1.0/80_20 has 0.26, and the sweep
     has 70_30 alpha=0.5 at recall 0.3729.
   - **Unverified / does not reproduce from this repo:** the paper's own
@@ -152,19 +158,60 @@ Cloud free tier — sleeps after inactivity, wakes on first visit).
     identical vocabularies.
   - `openpyxl==3.1.5` installed in `.venv` and added to
     `requirements.txt`; `pd.read_excel('dataset.xlsx')` now loads (1200, 2).
+- 2026-11-03 (label fix, app preprocessing, pickle warning):
+  - **Labels corrected** across README / PROGRESS / ERRATA /
+    `results_leakfree.txt` legend / app.py display text: `Positif` =
+    non-hate, `Negatif` = hate against Islam (paper §2.1, Table 1).
+    Key Finding rewritten from numbers already in the logged runs and
+    `results_leakfree.txt`. `eval_leakfree.py` re-run after the legend
+    change: `results_leakfree.txt` differs from the previous version in
+    the legend line only (git diff: 1 line).
+  - **app.py preprocessing now calls `preprocessing.preprocess_text`.**
+    Before: the app's own copy (no URL/mention stripping, `word_tokenize`)
+    produced different processed text from training on 982 / 1,200
+    dataset rows (e.g. mention handles kept as tokens); deployed-model
+    predictions differed on 0 / 1,200 rows, but `predict_proba` was not
+    identical. After: app function (extracted from app.py via AST) vs
+    `preprocessing.preprocess_text` on all 1,200 rows — cleaned, lower,
+    tokens, no-stopword, stemmed and processed text all 0 differing;
+    predictions 0 differing; `predict_proba` identical.
+    `preprocessing.preprocess_text` reproduces the committed
+    `csv/preprocessed_data.csv` `processed_text` on all 1,191 deduped
+    rows (0 differing). Headless `streamlit.testing.v1.AppTest` run of
+    app.py: no exception, prediction and probability table render.
+    Model and pickles unchanged (alpha=2.0 / 80:20).
+  - **Pickle `InconsistentVersionWarning` is benign for sklearn 1.9.0.**
+    Cause: `mnb_alpha_2.0_tuning_maksimal_ratio_80_20.pkl` and
+    `countvectorizer.pkl` were saved with scikit-learn 1.5.1 (warning
+    text names 1.5.1 for both); `requirements.txt` leaves scikit-learn
+    unpinned. Check: same 1,200 preprocessed texts loaded in a scratch
+    venv (Python 3.11.15, scikit-learn 1.5.1, numpy 2.4.6; no version
+    warning on load) and in `.venv` (Python 3.14.7, scikit-learn 1.9.0):
+    `predict`, `predict_proba`, the BoW matrix, `feature_log_prob_`,
+    `class_log_prior_`, `classes_`, `alpha` and `vocabulary_` all
+    exactly equal (max abs diff 0.0). Not retrained, pickles not
+    regenerated. scikit-learn **not pinned**: 1.5.1 has no wheels for
+    Python 3.13+, the repo has no `runtime.txt` / Python setting, and
+    Streamlit Cloud's Python for this app can't be seen from here, so a
+    `==1.5.1` pin could break the deploy. A future unpinned release could
+    still change loading behaviour.
+  - Close-out: code-reviewer (no blocking issues), security-review (no
+    findings; reviewed by hand because the skill's git context ran in
+    another directory), simplify (trimmed the now-unused
+    `punkt`/`punkt_tab` downloads), verification re-run (equivalence 0
+    differing on all fields, AppTest OK, `eval_leakfree.py` exit 0 with
+    the legend line as the only diff). Not pushed, so the live demo
+    still runs the old preprocessing until the owner pushes.
 
 ## Next up
-- **Decision for the owner: label meaning.** The paper (§2.1, Table 1)
-  defines `Positif` = non-hate, `Negatif` = hate against Islam; the
-  README calls `Positif` hate speech. Confirm which is right for
-  `dataset.xlsx`. The README's Results header and Key Finding ("misses
-  ~4 in 5 hate-speech tweets") depend on it, and were left as they are.
-- **Decision for the owner: deployed demo config.** Switching the demo
-  to a leak-free config is left to the owner (no model or app change
-  made). Trade-off on leak-free numbers, where the always-Negatif
+- **Deployed demo config: decided — stays alpha=2.0 / 80:20** (owner
+  decision 2026-11-03; model and pickle unchanged). Trade-off on leak-free numbers, where the always-Negatif
   baseline is ~0.835-0.838 and no config beats it on accuracy: the
   CV-accuracy pick (alpha=3.0) gives ~0.82-0.83 accuracy with only
-  ~0.09-0.11 Positif recall; the
+  ~0.09-0.11 Positif (non-hate) recall; the
   current alpha=2.0/80:20 re-fit leak-free gives 0.8170 / 0.1316; a
   recall-oriented pick (70:30, alpha=0.4) gives 0.8291 accuracy with
-  0.3103 Positif recall.
+  0.3103 Positif (non-hate) recall.
+- Not done (outside the 2026-11-03 scope): `requirements.txt` still
+  installs scikit-learn unpinned; see the verification log entry on the
+  pickle warning for why it was not pinned.

@@ -11,11 +11,11 @@ Multinomial Naive Bayes classifier detecting hate speech directed at Islam in In
 
 ## Overview
 
-**Problem.** Automatically flagging hate speech against religious groups on social media is a narrow, high-stakes text classification task: the signal is sparse (most tweets aren't hate speech), the language is informal Indonesian Twitter text, and a false negative (missing real hate speech) is more costly than a false positive.
+**Problem.** Automatically flagging hate speech against religious groups on social media is a narrow, high-stakes text classification task: in this dataset hate speech is the majority (83.5% of rows), so the hard part is recognising the minority of non-hate tweets about Islam, the language is informal Indonesian Twitter text, and errors in both directions matter: missed hate speech, and non-hate tweets wrongly flagged as hate (false alarms).
 
 **Approach.**
 
-1. Collected and labeled ~1,200 Indonesian-language tweets as **Negatif** (no hate speech) or **Positif** (hate speech present).
+1. Collected and labeled ~1,200 Indonesian-language tweets as **Negatif** (hate speech against Islam; 1,002 rows, 83.5%) or **Positif** (non-hate speech; 198 rows, 16.5%), following the paper's label definition (Section 2.1, Table 1).
 2. Preprocessed text: URL/mention/hashtag stripping, case folding, tokenization, Indonesian stopword removal, stemming.
 3. The notebook also derives lexicon-based labels from `lexicon/positive.tsv` / `lexicon/negative.tsv` (written to `csv/*_with_classes.csv`), but these are **not used in training**: the model is trained on the manual labels with Bag-of-Words features only.
 4. Vectorized with `CountVectorizer` and trained **Multinomial Naive Bayes**, systematically tuning the smoothing parameter `alpha` (0.01 → 3.0) across three train/test splits (70/30, 80/20, 90/10).
@@ -27,12 +27,12 @@ Full walkthrough is in [`skripsi.ipynb`](skripsi.ipynb).
 
 Headline accuracy tops out at **84%** (`alpha=3.0`, 70/30 split), but accuracy is the wrong number to optimize here — see Key Finding below. The demo app ships with **`alpha=2.0`, 80/20 split**:
 
-| Config | Accuracy | Positif (hate speech) Recall | Positif F1 |
-|---|---|---|---|
-| alpha=3.0, 70/30 (highest accuracy, tied with alpha=2.0) | 0.84 | 0.14 | 0.21 |
-| alpha=2.0, 70/30 | 0.84 | 0.20 | 0.29 |
-| **alpha=2.0, 80/20 (deployed)** | 0.83 | **0.18** | **0.25** |
-| alpha=1.0, 80/20 | 0.82 | 0.26 | 0.32 |
+| Config | Accuracy | Positif (non-hate) Recall | Positif (non-hate) F1 | Negatif (hate) Precision / Recall |
+|---|---|---|---|---|
+| alpha=3.0, 70/30 (highest accuracy, tied with alpha=2.0) | 0.84 | 0.14 | 0.21 | 0.85 / 0.97 |
+| alpha=2.0, 70/30 | 0.84 | 0.20 | 0.29 | 0.86 / 0.96 |
+| **alpha=2.0, 80/20 (deployed)** | 0.83 | **0.18** | **0.25** | 0.86 / 0.96 |
+| alpha=1.0, 80/20 | 0.82 | 0.26 | 0.32 | 0.87 / 0.93 |
 
 The 70/30 and 80/20 rows are scored on different test sets, so they are not directly comparable. On the same 70/30 test set, alpha=2.0 has the same accuracy as alpha=3.0 (0.8352 for both) with higher Positif recall (0.20 vs 0.14). These are original-pipeline figures; see the **Reproducibility note** below for leak-free numbers.
 
@@ -40,7 +40,7 @@ Full sweep across every alpha × split combination tested is in `csv/accuracy_*.
 
 ## Key Finding / Limitation
 
-**Class imbalance is the real bottleneck, not the algorithm — and optimizing for accuracy alone makes the actual problem worse.** The alpha that maximizes headline accuracy (3.0) has the *worst* recall on the `Positif` (hate speech) class of any tuned configuration — it does well by predicting `Negatif` almost every time, since that's the majority class. A hate-speech filter that catches 14% of real hate speech is not a useful filter, regardless of its accuracy score. This tension — and the fact that the deployed config still misses roughly 4 in 5 real hate-speech tweets — is the central limitation, documented in the published paper, not glossed over.
+**Class imbalance is the real bottleneck, not the algorithm — and optimizing for accuracy alone makes the actual problem worse.** `Negatif` (hate speech) is the majority class, and the model leans heavily towards it. Hate-speech recall is high: 0.96 for the deployed alpha=2.0/80:20 config with precision 0.86 (original pipeline), and 0.9492 with precision 0.8500 when that config is re-fit leak-free. The minority `Positif` (non-hate) class is mostly misclassified as hate: the deployed config recognises only 0.18 of non-hate tweets (0.1316 leak-free), and the alpha that maximizes headline accuracy (3.0) recognises 0.14 at 70/30 (0.09–0.11 leak-free). So the practical limitation is false alarms: roughly 4 in 5 non-hate tweets about Islam get flagged as hate speech. Accuracy hides this, because always predicting `Negatif` already scores 0.833–0.838 on these test sets, and no configuration beats that baseline: the original 70/30 alpha=2.0/3.0 equal it (0.8352), the deployed config is below it (0.8285 vs 0.8368), and every leak-free accuracy is at or below it (see Reproducibility note).
 
 ## Reproducibility note
 
@@ -55,17 +55,19 @@ The figures in the published paper (JISMEDIA, July 2024) and in the Results tabl
 | Setting | As published / original pipeline | Leak-free re-run |
 |---|---|---|
 | 90:10, alpha=1.0 (paper's Model F), accuracy | 85% (paper); 0.78 in this repo's committed `csv/` | 0.7949 (117 test rows) |
-| 90:10, alpha=1.0, Positif precision / recall / F1 | 60 / 16 / 25% (paper, Table 9) | 0.22 / 0.11 / 0.14 |
+| 90:10, alpha=1.0, Positif (non-hate) precision / recall / F1 | 60 / 16 / 25% (paper, Table 9) | 0.22 / 0.11 / 0.14 |
 | 10-fold CV mean accuracy | 79.09% (paper) | 0.8085 (90:10 training portion, alpha=1.0) |
 | 80:20, alpha=2.0 (deployed config), accuracy | 0.83 | 0.8170 (235 test rows) |
-| 80:20, alpha=2.0, Positif precision / recall / F1 | 0.44 / 0.18 / 0.25 | 0.33 / 0.13 / 0.19 |
-| Alpha picked by CV accuracy, per ratio | — | 3.0 for all three ratios; test accuracy 0.8319 / 0.8298 / 0.8205 (70:30 / 80:20 / 90:10), Positif recall 0.09 / 0.11 / 0.11 |
+| 80:20, alpha=2.0, Positif (non-hate) precision / recall / F1 | 0.44 / 0.18 / 0.25 | 0.33 / 0.13 / 0.19 |
+| Alpha picked by CV accuracy, per ratio | — | 3.0 for all three ratios; test accuracy 0.8319 / 0.8298 / 0.8205 (70:30 / 80:20 / 90:10), Positif (non-hate) recall 0.09 / 0.11 / 0.11 |
 
 **Majority-class baseline.** Predicting `Negatif` for every row scores 0.8352 / 0.8368 / 0.8333 on the original 70:30 / 80:20 / 90:10 test sets, and 0.8348 / 0.8383 / 0.8376 on the leak-free ones. Every leak-free accuracy above is at or below this baseline. In the original pipeline, alpha=2.0 and alpha=3.0 at 70:30 score exactly the baseline (0.8352), and the deployed config's 0.8285 is below its baseline of 0.8368.
 
 The paper's 85% (90:10, alpha=1.0) and 79.09% CV figures are not reproduced by this repo's current code. The committed results for that setting give 0.78, and a fresh re-run of the original code gives 0.79. The paper's results appear to come from a different run or configuration than the one committed here.
 
-**Label definition.** The paper (Section 2.1, Table 1) defines `Positif` as non-hate speech and `Negatif` as hate speech against Islam. This README describes `Positif` as hate speech. The two descriptions are opposite, and the owner has not yet confirmed which one holds for `dataset.xlsx`. All numbers here are reported per label name.
+**Label definition.** As defined in the paper (Section 2.1, Table 1): `Positif` = non-hate speech toward Islam, `Negatif` = hate speech against Islam. `dataset.xlsx` has 1,002 `Negatif` (83.5%) and 198 `Positif` (16.5%) rows. Earlier versions of this README described `Positif` as hate speech, which inverted the Key Finding; corrected 2026-11-03.
+
+**scikit-learn version warning.** The pickles were saved with scikit-learn 1.5.1, so loading them under a newer version (the app installs scikit-learn unpinned) raises `InconsistentVersionWarning`. Checked 2026-11-03: under 1.5.1 (Python 3.11) and 1.9.0 (Python 3.14) the deployed model and vectorizer give identical `predict` and `predict_proba` on all 1,200 dataset rows, with identical vocabulary and model parameters, so the warning is benign for these two versions. A future scikit-learn release could still change this.
 
 Full detail: [`ERRATA.md`](ERRATA.md) and [`PROGRESS.md`](PROGRESS.md).
 
@@ -77,7 +79,7 @@ Al Juhaeda, Z. I., Faisal, M., & Suhartono. (2024). *Sentiment Classification of
 
 - **Python**, **Jupyter Notebook**
 - **scikit-learn** — CountVectorizer, MultinomialNB, KFold cross-validation
-- **NLTK** — Indonesian stopword list; stemming uses NLTK's English `PorterStemmer`, applied as-is to Indonesian text (no Indonesian stemmer). The training pipeline (`preprocessing.py`) tokenizes with `str.split()`; the demo app (`app.py`) tokenizes with NLTK `word_tokenize`.
+- **NLTK** — Indonesian stopword list; stemming uses NLTK's English `PorterStemmer`, applied as-is to Indonesian text (no Indonesian stemmer). Tokenization is `str.split()`; the demo app (`app.py`) calls the same `preprocessing.py` functions as training (until 2026-11-03 it used its own copy with NLTK `word_tokenize` and no URL/mention stripping).
 - **Streamlit** — interactive demo app
 - **pandas / NumPy** — data handling
 
@@ -124,10 +126,10 @@ Open `skripsi.ipynb` and run all cells — it downloads required NLTK resources 
 
 ## Limitations
 
-- **Small dataset** (~1,200 tweets) for a 2-class problem with real class imbalance — limits how well the minority (`Positif`) class can be learned.
+- **Small dataset** (~1,200 tweets) for a 2-class problem with real class imbalance — limits how well the minority (`Positif`, non-hate) class can be learned.
 - **Single platform, single language variant** — Indonesian-language Twitter text only; informal/slang coverage depends entirely on what's in the training set and lexicon.
 - **Bag-of-Words + Naive Bayes** has no notion of word order or context — sarcasm, negation, and indirect hate speech are hard cases this architecture structurally can't catch.
-- See **Key Finding** above — low recall on the `Positif` class is the main limitation, not a footnote.
+- See **Key Finding** above — low recall on the `Positif` (non-hate) class, i.e. non-hate tweets flagged as hate, is the main limitation, not a footnote.
 
 ## Status
 

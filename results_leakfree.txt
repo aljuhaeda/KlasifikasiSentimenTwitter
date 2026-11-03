@@ -1,7 +1,7 @@
 Leak-free re-evaluation, KlasifikasiSentimenTwitter
 python 3.14.7, scikit-learn 1.9.0, numpy 2.5.2, pandas 3.0.5, nltk 3.10.2
 seed 42 (train_test_split stratified, KFold shuffle); alpha grid [0.01, 0.1, 0.4, 0.5, 0.6, 0.8, 1.0, 2.0, 3.0]
-Class names are the dataset labels (Positif / Negatif); see README for what each label means.
+Label legend (paper Section 2.1, Table 1): Positif = non-hate speech; Negatif = hate speech against Islam.
 
 rows: 1200 raw -> 1191 after drop_duplicates(); class counts {'Negatif': 995, 'Positif': 196}
 

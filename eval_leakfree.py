@@ -85,7 +85,7 @@ def main():
     out(f'python {platform.python_version()}, scikit-learn {sklearn.__version__}, '
         f'numpy {np.__version__}, pandas {pd.__version__}, nltk {nltk.__version__}')
     out(f'seed {SEED} (train_test_split stratified, KFold shuffle); alpha grid {ALPHAS}')
-    out('Class names are the dataset labels (Positif / Negatif); see README for what each label means.')
+    out('Label legend (paper Section 2.1, Table 1): Positif = non-hate speech; Negatif = hate speech against Islam.')
     out()
 
     df = pd.read_excel(os.path.join(BASE_DIR, 'dataset.xlsx'))
