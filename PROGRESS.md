@@ -223,5 +223,7 @@ Cloud free tier — sleeps after inactivity, wakes on first visit).
   recall-oriented pick (70:30, alpha=0.4) gives 0.8291 accuracy with
   0.3103 Positif (non-hate) recall.
 - Note: the `requirements.txt` pins (scikit-learn 1.9.0 etc.) are pushed
-  and the demo rebuilt after them. Still unchecked: the app's Python
-  setting in Streamlit Cloud (the pins need 3.11+).
+  and the demo rebuilt after them; Cloud runs Python 3.14. Checked live
+  2026-11-05: page renders, Predict returns a result, no exception. A
+  benign test sentence came back Negatif, which matches the limitation
+  above and is not a new fault.
