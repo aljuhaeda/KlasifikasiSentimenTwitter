@@ -1,6 +1,6 @@
 # Errata and reproducibility notes
 
-The published paper (Al Juhaeda, Faisal & Suhartono, JISMEDIA 1(1), 34–38, July 2024) and the original pipeline's committed results in `csv/` and `pickle/` are unchanged. This file records what a 2026-11-03 re-examination of this repo found, next to the published figures. It is not a retraction.
+The published paper (Al Juhaeda, Faisal & Suhartono, JISMEDIA 1(2), 31–38, December 2024; the PDF's running header instead reads "Vol. 1, Issue. 1, Pag. 34-38, July 2024") and the original pipeline's committed results in `csv/` and `pickle/` are unchanged. This file records what a 2026-11-03 re-examination of this repo found, next to the published figures. It is not a retraction.
 
 ## 1. Evaluation issues in the original pipeline
 

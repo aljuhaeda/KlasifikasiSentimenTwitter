@@ -44,7 +44,7 @@ Full sweep across every alpha × split combination tested is in `csv/accuracy_*.
 
 ## Reproducibility note
 
-The figures in the published paper (JISMEDIA, July 2024) and in the Results table above come from the **original pipeline** and are kept as published. A 2026-11-03 audit of this repo found three issues in that pipeline that make its test-set numbers optimistic:
+The figures in the published paper (JISMEDIA, December 2024) and in the Results table above come from the **original pipeline** and are kept as published. A 2026-11-03 audit of this repo found three issues in that pipeline that make its test-set numbers optimistic:
 
 1. **Vectorizer fit includes test rows.** The `CountVectorizer` (1,000-word vocabulary) is fit once on the union of all three ratios' training sets. The three splits are different partitions, so 238 of the 358 test rows at 70:30 and 119 of the 239 at 80:20 are training rows of another ratio and were in the vectorizer's fit corpus. Only the vocabulary leaked, not labels. Counting rows whose text matches a fit-corpus row, the figures are 241/358, 122/239 and 3/120 (90:10).
 2. **Duplicates across the split.** After preprocessing, 7/358, 4/239 and 3/120 test rows have the same text as a row in their training set.
@@ -73,7 +73,7 @@ Full detail: [`ERRATA.md`](ERRATA.md) and [`PROGRESS.md`](PROGRESS.md).
 
 ## Publication
 
-Al Juhaeda, Z. I., Faisal, M., & Suhartono. (2024). *Sentiment Classification of Hate Speech Against Islam on Twitter Platform Using Multinomial Naïve Bayes.* Journal of Informatics and Science Media (JISMEDIA), 1(1), 34–38. [View on Garuda](https://garuda.kemdiktisaintek.go.id/documents/detail/4926421)
+Al Juhaeda, Z. I., Faisal, M., & Suhartono. (2024). *Sentiment Classification of Hate Speech Against Islam on Twitter Platform Using Multinomial Naïve Bayes.* Journal of Informatics and Science Media (JISMEDIA), 1(2), 31–38. [View on Garuda](https://garuda.kemdiktisaintek.go.id/documents/detail/4926421)
 
 ## Tech Stack
 
@@ -137,7 +137,7 @@ Open `skripsi.ipynb` and run all cells — it downloads required NLTK resources 
 - [x] Alpha tuning across 3 train/test splits
 - [x] 10-fold cross-validation
 - [x] Streamlit demo app
-- [x] Published (JISMEDIA Vol. 1 Iss. 1, July 2024)
+- [x] Published (JISMEDIA Vol. 1 No. 2, December 2024)
 - [x] Deployed (Streamlit Community Cloud)
 
 ## License

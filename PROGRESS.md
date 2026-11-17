@@ -13,7 +13,7 @@ Cloud free tier — sleeps after inactivity, wakes on first visit).
 - Published: Al Juhaeda, Z. I., Faisal, M., & Suhartono (2024),
   *Sentiment Classification of Hate Speech Against Islam on Twitter
   Platform Using Multinomial Naïve Bayes*, Journal of Informatics and
-  Science Media (JISMEDIA), Vol. 1 Iss. 1, pp. 34–38, July 2024.
+  Science Media (JISMEDIA), Vol. 1 No. 2, pp. 31–38, December 2024.
 - Deployed config is alpha=2.0 / 80:20 (original pipeline: acc 0.83,
   Positif recall 0.18). The earlier rationale ("trades 1% accuracy for
   +4pp recall over alpha=3.0/70:30") compared different test splits; on
@@ -21,6 +21,12 @@ Cloud free tier — sleeps after inactivity, wakes on first visit).
   recall 0.20 vs 0.14 (corrected 2026-11-03, see README Results).
 - Citation corrected from "JISMAN Journal, Nov 2024" to JISMEDIA Vol. 1
   Iss. 1, pp. 34-38, July 2024 (commit b0be3b5) — closed.
+- Citation corrected again (2026-11-17) to JISMEDIA 1(2), pp. 31–38,
+  December 2024, the journal's article page
+  (jismandiri.com/index.php/jisman/article/view/48, published
+  2024-12-31), which matches Garuda. The PDF's running header ("Vol. 1,
+  Issue. 1, Pag. 34-38, July 2024") is the outlier. README and ERRATA
+  updated.
 - Leak-free re-evaluation (`eval_leakfree.py` → `results_leakfree.txt`),
   README "Reproducibility note" and `ERRATA.md` added 2026-11-03;
   published figures and original artifacts left unchanged.
